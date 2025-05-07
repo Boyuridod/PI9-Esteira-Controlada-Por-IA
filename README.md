@@ -23,10 +23,12 @@ O projeto consiste na construção de uma **esteira transportadora inteligente**
 
 ## 👨‍💻 Contribuidores
 - Igor Vendramini Mendes Garcia
-- Guilherme Massariolli
+- Guilherme Massariolli Hermenegildo Souza
 - Maria Fernanda Rocha Pereira
 - Yuri David Silva Duarte
 - Prof. Orientador: Daniel Caixeta
 
 ### Instituto Federal do Triângulo Mineiro – Campus Uberaba
 ### Projeto acadêmico – 2025
+
+<!-- TODO Continuar desenvolvendo README -->
