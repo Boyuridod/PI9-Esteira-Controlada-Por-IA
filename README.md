@@ -32,3 +32,6 @@ O projeto consiste na construção de uma **esteira transportadora inteligente**
 ### Projeto acadêmico – 2025
 
 <!-- TODO Continuar desenvolvendo README -->
+
+### REFERÊNCIAS
+- https://www.makerhero.com/blog/modulo-camera-vga-ov7670/?srsltid=AfmBOoq0MN0q0LCMPcaDze8ym5dByyY9yNaV57d4864lxKcvpNRjMyQQ
