@@ -15,11 +15,8 @@ O projeto consiste na construção de uma **esteira transportadora inteligente**
 
 ## 🛠 Tecnologias Utilizadas
 
-- **Python** – Lógica principal e visão computacional
-- **OpenCV** – Processamento de imagem
-- **TensorFlow / Scikit-learn** – Treinamento e execução de modelos de IA
-- **Arduino / Raspberry Pi** – Controle físico da esteira e sensores
-- **MQTT / Comunicação Serial** – Integração entre módulos e controle remoto
+- **NODEMCU ESP8266** – Controle físico da esteira e sensores
+- **Python / TensorFlow / Scikit-learn** – Treinamento e execução de modelos de IA
 
 ## 👨‍💻 Contribuidores
 - Igor Vendramini Mendes Garcia
