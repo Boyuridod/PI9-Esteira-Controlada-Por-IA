@@ -38,7 +38,7 @@ fun TelaProjetos8() {
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            
+
         }
     }
 }
