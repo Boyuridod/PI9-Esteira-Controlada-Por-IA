@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission
+        android:name="android.permission.CAMERA"
+        tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,10 +17,21 @@
         android:theme="@style/Theme.OlhosDaEsteira"
         tools:targetApi="31">
         <activity
+            android:name=".Projetos8"
+            android:exported="false"
+            android:label="@string/title_activity_projetos8"
+            android:theme="@style/Theme.OlhosDaEsteira" />
+        <activity
+            android:name=".Projetos9Activity"
+            android:exported="false"
+            android:label="@string/title_activity_projetos9"
+            android:theme="@style/Theme.OlhosDaEsteira" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.OlhosDaEsteira">
+            android:theme="@style/Theme.OlhosDaEsteira"
+            tools:ignore="RedundantLabel">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
