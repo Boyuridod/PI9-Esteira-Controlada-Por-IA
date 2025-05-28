@@ -2,60 +2,49 @@
 #include <FirebaseESP8266.h>
 
 // --- Credenciais do WiFi ---
-#define WIFI_SSID "SUA_REDE_WIFI"
-#define WIFI_PASSWORD "SUA_SENHA_WIFI"
+#define WIFI_SSID "igru"
+#define WIFI_PASSWORD "senhadificil"
 
 // --- Credenciais do Firebase ---
-#define FIREBASE_HOST "PI9.firebaseio.com" 
+#define FIREBASE_HOST "https://projetos9-8b610-default-rtdb.firebaseio.com/" 
 #define FIREBASE_AUTH "vFnruXsqY3BWeeDzXBVaNvddWp2TCktBei1aFiB5"
 
-// --- Objetos Firebase ---
 FirebaseData firebaseData;
-
-// --- Variável de exemplo para enviar ---
-int contador = 0;
+FirebaseAuth auth;
+FirebaseConfig config;
 
 void setup() {
   Serial.begin(115200);
-  Serial.println();
-  Serial.println("Iniciando...");
-
-  // --- Conectar ao WiFi ---
+  
+  // Conecta ao WiFi
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Conectando ao WiFi");
   while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
     delay(500);
+    Serial.print(".");
   }
-  Serial.println();
-  Serial.print("Conectado com sucesso! Endereço IP: ");
-  Serial.println(WiFi.localIP());
-  Serial.println();
+  Serial.println("Conectado ao WiFi");
 
-  // --- Inicializar Firebase ---
-  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  // Configura o Firebase
+  config.host = FIREBASE_HOST;
+  config.signer.tokens.legacy_token = FIREBASE_AUTH;
+
+  // Inicializa a conexão com o Firebase
+  Firebase.begin(&config, &auth);
+
+  // (Opcional) Define reconexão automática ao WiFi
   Firebase.reconnectWiFi(true);
-
-  Serial.println("Setup concluído.");
 }
 
 void loop() {
-  
-  String caminhoFirebase = "/esp8266/contador";
-
-  Serial.print("Enviando contador para Firebase: ");
-  Serial.println(contador);
-
-  // Envia o valor do contador para o Firebase no caminho especificado
-  if (Firebase.setInt(firebaseData, caminhoFirebase, contador)) {
-    Serial.println("Dados enviados com sucesso!");
+  // Exemplo: grava um valor
+  if (Firebase.setInt(firebaseData, "/teste", 123)) {
+    Serial.println("Dados enviados!");
   } else {
-    Serial.print("Erro ao enviar dados: ");
+    Serial.print("Erro: ");
     Serial.println(firebaseData.errorReason());
   }
 
-  contador++; // Incrementa o contador
-
-  delay(5000); // Espera 5 segundos antes de enviar novamente
+  delay(5000);
 }
 
