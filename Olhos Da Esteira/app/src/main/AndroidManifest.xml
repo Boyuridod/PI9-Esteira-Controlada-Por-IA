@@ -17,7 +17,7 @@
         android:theme="@style/Theme.OlhosDaEsteira"
         tools:targetApi="31">
         <activity
-            android:name=".Projetos8"
+            android:name=".Projetos8Activity"
             android:exported="false"
             android:label="@string/title_activity_projetos8"
             android:theme="@style/Theme.OlhosDaEsteira" />

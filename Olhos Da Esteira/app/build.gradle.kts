@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services") version "4.4.2"
 }
 
 android {
@@ -65,6 +66,11 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.6.1")
 
     implementation("androidx.navigation:navigation-compose:2.9.0")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
+    implementation("com.google.firebase:firebase-firestore")
+
+
 
 
 }

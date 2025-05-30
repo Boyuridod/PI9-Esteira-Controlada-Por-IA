@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "885190045045",
+    "firebase_url": "https://projetos9-8b610-default-rtdb.firebaseio.com",
+    "project_id": "projetos9-8b610",
+    "storage_bucket": "projetos9-8b610.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:885190045045:android:9cb367e3ffc361b32b773c",
+        "android_client_info": {
+          "package_name": "com.example.olhosdaesteira"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJ2k6KsoH0QwVv51kyimaoJvHRwm1io-I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

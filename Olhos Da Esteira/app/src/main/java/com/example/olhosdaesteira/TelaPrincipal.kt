@@ -21,10 +21,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.olhosdaesteira.ui.theme.OlhosDaEsteiraTheme
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             OlhosDaEsteiraTheme {
                 TelaPrincipal()
@@ -59,7 +61,10 @@ fun TelaPrincipal() {
                 Text("Projetos 9")
             }
             Button(
-                onClick = { /* ação do botão 2 */ },
+                onClick = {
+                    val intent = Intent(context, Projetos8Activity::class.java)
+                    context.startActivity(intent)
+                },
                 modifier = Modifier
                     .width(200.dp)
                     .height(100.dp),
