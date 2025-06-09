@@ -1,6 +1,8 @@
 package com.example.olhosdaesteira
 
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -30,7 +32,10 @@ import com.example.olhosdaesteira.ui.theme.OlhosDaEsteiraTheme
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
 import com.google.firebase.storage.ktx.storage
+import org.tensorflow.lite.Interpreter
 import java.io.File
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import androidx.camera.core.Preview as CameraPreview
 
 class Projetos9Activity : ComponentActivity() {
@@ -126,6 +131,39 @@ fun TelaCamera() {
                     object : ImageCapture.OnImageSavedCallback {
                         override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                             val fileUri = Uri.fromFile(file)
+                            val inputStream = context.contentResolver.openInputStream(fileUri)
+                            val bitmap = BitmapFactory.decodeStream(inputStream)
+                            inputStream?.close()
+
+                            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true)
+
+                            val inputBuffer = ByteBuffer.allocateDirect(224 * 224 * 3 * 4)
+                            inputBuffer.order(ByteOrder.nativeOrder())
+                            for (y in 0 until 224) {
+                                for (x in 0 until 224) {
+                                    val pixel = resizedBitmap.getPixel(x, y)
+                                    inputBuffer.putFloat(((pixel shr 16 and 0xFF) / 255.0f))
+                                    inputBuffer.putFloat(((pixel shr 8 and 0xFF) / 255.0f))
+                                    inputBuffer.putFloat(((pixel and 0xFF) / 255.0f))
+                                }
+                            }
+
+                            val assetFileDescriptor = context.assets.openFd("model.tflite")
+                            val fileInputStream = assetFileDescriptor.createInputStream()
+                            val fileChannel = fileInputStream.channel
+                            val modelBuffer = fileChannel.map(
+                                java.nio.channels.FileChannel.MapMode.READ_ONLY,
+                                assetFileDescriptor.startOffset,
+                                assetFileDescriptor.declaredLength
+                            )
+                            val interpreter = Interpreter(modelBuffer)
+
+                            val output = Array(1) { FloatArray(10) }
+                            interpreter.run(inputBuffer, output)
+
+                            val resultado = output[0].withIndex().maxByOrNull { it.value }
+                            Toast.makeText(context, "Classe detectada: ${resultado?.index}", Toast.LENGTH_LONG).show()
+
                             val storageRef = com.google.firebase.ktx.Firebase.storage.reference
                             val imageRef = storageRef.child("imagens/${file.name}")
 
@@ -138,12 +176,9 @@ fun TelaCamera() {
                                         Toast.makeText(context, "Imagem salva no banco!", Toast.LENGTH_SHORT).show()
                                     }
                                 }
-                                .addOnFailureListener { exception ->
-                                    Toast.makeText(context, "Erro ao enviar imagem: ${exception.message}", Toast.LENGTH_LONG).show()
-                                    exception.printStackTrace()
+                                .addOnFailureListener {
+                                    Toast.makeText(context, "Erro ao enviar imagem: ${it.message}", Toast.LENGTH_LONG).show()
                                 }
-
-                            Toast.makeText(context, "Foto salva!", Toast.LENGTH_SHORT).show()
                         }
 
                         override fun onError(exception: ImageCaptureException) {

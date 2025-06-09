@@ -3,6 +3,7 @@ from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from keras.layers import BatchNormalization
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from keras.preprocessing.image import load_img, img_to_array
+import tensorflow as tf
 
 import os
 import numpy as np
@@ -51,7 +52,7 @@ dados_treinamento = ImageDataGenerator(rescale = 1./255,
 dados_teste = ImageDataGenerator(rescale = 1./255)
 
 #Especificação dos dados
-os.chdir(r'D:\Imagens\Imagens')
+os.chdir(r'D:\DesenvolvimentoProjetos\PI9-Esteira-com-IA\CodigoIAReconhecimenrto\IA')
 
 
 amostras_treinamento = dados_treinamento.flow_from_directory('TreinamentoCaixa',
@@ -71,7 +72,15 @@ classificador.fit(amostras_treinamento,
                             validation_data = amostras_teste,
                             validation_steps = 60)
 
-classificador.save('my_model.h5')
+classificador.save('my_model.keras')
+
+model = tf.keras.models.load_model("my_model.keras")
+
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+with open("modelo.tflite", "wb") as f:
+    f.write(tflite_model)
+
 
 #imagem_teste = load_img('resultados1_2\subImage0.png', target_size = (120,120))
 #imagem_teste = img_to_array(imagem_teste)
