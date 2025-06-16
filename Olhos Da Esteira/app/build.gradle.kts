@@ -42,9 +42,7 @@ android {
 
 dependencies {
 
-    implementation ("org.tensorflow:tensorflow-lite:2.13.0")
-    implementation ("org.tensorflow:tensorflow-lite-support:0.4.3")
-    implementation ("org.tensorflow:tensorflow-lite-metadata:0.1.0")
+    implementation ("org.tensorflow:tensorflow-lite:2.14.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

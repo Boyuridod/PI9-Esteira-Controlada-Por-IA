@@ -34,8 +34,10 @@ import com.google.firebase.database.database
 import com.google.firebase.storage.ktx.storage
 import org.tensorflow.lite.Interpreter
 import java.io.File
+import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.channels.FileChannel
 import androidx.camera.core.Preview as CameraPreview
 
 class Projetos9Activity : ComponentActivity() {
@@ -79,7 +81,6 @@ fun Projetos9() {
         }
     }
 }
-
 @Composable
 fun TelaCamera() {
     val context = LocalContext.current
@@ -131,39 +132,61 @@ fun TelaCamera() {
                     object : ImageCapture.OnImageSavedCallback {
                         override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                             val fileUri = Uri.fromFile(file)
-                            val inputStream = context.contentResolver.openInputStream(fileUri)
-                            val bitmap = BitmapFactory.decodeStream(inputStream)
-                            inputStream?.close()
 
-                            val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true)
+                            try {
+                                val inputStream = context.contentResolver.openInputStream(fileUri)
+                                val bitmap = BitmapFactory.decodeStream(inputStream)
+                                inputStream?.close()
 
-                            val inputBuffer = ByteBuffer.allocateDirect(224 * 224 * 3 * 4)
-                            inputBuffer.order(ByteOrder.nativeOrder())
-                            for (y in 0 until 224) {
-                                for (x in 0 until 224) {
-                                    val pixel = resizedBitmap.getPixel(x, y)
-                                    inputBuffer.putFloat(((pixel shr 16 and 0xFF) / 255.0f))
-                                    inputBuffer.putFloat(((pixel shr 8 and 0xFF) / 255.0f))
-                                    inputBuffer.putFloat(((pixel and 0xFF) / 255.0f))
+                                // Redimensiona a imagem para o tamanho esperado pelo modelo
+                                val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, true)
+
+                                // Prepara o ByteBuffer de entrada
+                                val inputBuffer = ByteBuffer.allocateDirect(120 * 120 * 3 * 4)
+                                inputBuffer.order(ByteOrder.nativeOrder())
+
+                                for (y in 0 until 120) {
+                                    for (x in 0 until 120) {
+                                        val pixel = resizedBitmap.getPixel(x, y)
+                                        inputBuffer.putFloat(((pixel shr 16 and 0xFF) / 255.0f)) // R
+                                        inputBuffer.putFloat(((pixel shr 8 and 0xFF) / 255.0f))  // G
+                                        inputBuffer.putFloat(((pixel and 0xFF) / 255.0f))        // B
+                                    }
                                 }
+                                inputBuffer.rewind()
+
+                                // Carrega o modelo TFLite
+                                val assetFileDescriptor = context.assets.openFd("model.tflite")
+                                val fileInputStream = FileInputStream(assetFileDescriptor.fileDescriptor)
+                                val fileChannel = fileInputStream.channel
+                                val startOffset = assetFileDescriptor.startOffset
+                                val declaredLength = assetFileDescriptor.declaredLength
+                                val modelBuffer = fileChannel.map(
+                                    FileChannel.MapMode.READ_ONLY,
+                                    startOffset,
+                                    declaredLength
+                                )
+
+                                val interpreter = Interpreter(modelBuffer)
+
+                                // Prepara a saída
+                                val output = Array(1) { FloatArray(2) }  // Saída com 2 classes
+                                interpreter.run(inputBuffer, output)
+
+                                // Pega o índice da classe com maior confiança
+                                val resultado = output[0].withIndex().maxByOrNull { it.value }
+                                Toast.makeText(
+                                    context,
+                                    "Classe detectada: ${resultado?.index} (Confiança: ${resultado?.value})",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Toast.makeText(context, "Erro ao processar modelo: ${e.message}", Toast.LENGTH_LONG).show()
                             }
 
-                            val assetFileDescriptor = context.assets.openFd("model.tflite")
-                            val fileInputStream = assetFileDescriptor.createInputStream()
-                            val fileChannel = fileInputStream.channel
-                            val modelBuffer = fileChannel.map(
-                                java.nio.channels.FileChannel.MapMode.READ_ONLY,
-                                assetFileDescriptor.startOffset,
-                                assetFileDescriptor.declaredLength
-                            )
-                            val interpreter = Interpreter(modelBuffer)
-
-                            val output = Array(1) { FloatArray(10) }
-                            interpreter.run(inputBuffer, output)
-
-                            val resultado = output[0].withIndex().maxByOrNull { it.value }
-                            Toast.makeText(context, "Classe detectada: ${resultado?.index}", Toast.LENGTH_LONG).show()
-
+                            // Upload para o Firebase Storage
                             val storageRef = com.google.firebase.ktx.Firebase.storage.reference
                             val imageRef = storageRef.child("imagens/${file.name}")
 
@@ -176,8 +199,9 @@ fun TelaCamera() {
                                         Toast.makeText(context, "Imagem salva no banco!", Toast.LENGTH_SHORT).show()
                                     }
                                 }
-                                .addOnFailureListener {
-                                    Toast.makeText(context, "Erro ao enviar imagem: ${it.message}", Toast.LENGTH_LONG).show()
+                                .addOnFailureListener { exception ->
+                                    Toast.makeText(context, "Erro ao enviar imagem: ${exception.message}", Toast.LENGTH_LONG).show()
+                                    exception.printStackTrace()
                                 }
                         }
 
@@ -195,6 +219,7 @@ fun TelaCamera() {
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
