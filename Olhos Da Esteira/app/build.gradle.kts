@@ -74,5 +74,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.guava:guava:32.1.2-jre")
     implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
 
 }

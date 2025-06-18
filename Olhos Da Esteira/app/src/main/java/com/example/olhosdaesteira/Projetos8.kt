@@ -1,6 +1,8 @@
 package com.example.olhosdaesteira
 
+import ApiService
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +48,7 @@ fun TelaProjetos8() {
     var ligado by remember { mutableStateOf(false) }
     var textoBotao = "Ligar lâmpada"
     var temperatura by remember { mutableStateOf(30) }
+    var service = ApiService("http://10.0.2.2:3333")
 
     Scaffold {
         innerPadding ->
@@ -59,12 +62,17 @@ fun TelaProjetos8() {
 
             Button(
                 onClick = {
-                    ligado = !ligado
-                    if(ligado) {
-                        textoBotao = "Desligar lâmpada"
-                    }
-                    else{
-                        textoBotao = "Ligar lâmpada"
+                    service.lamp1SwitchOn(ligado) { success, response ->
+                        if(success){
+                            ligado = !ligado
+                            if(ligado) {
+                                textoBotao = "Desligar lâmpada"
+                            }
+                            else{
+                                textoBotao = "Ligar lâmpada"
+                            }
+                        }
+                        else println("Error: $response")
                     }
                 },
                 elevation = ButtonDefaults.buttonElevation(
@@ -86,7 +94,14 @@ fun TelaProjetos8() {
                 )
                 Slider(
                     value = temperatura.toFloat(),
-                    onValueChange = { temperatura = it.toInt() },
+                    onValueChange = { temperatura = it.toInt()
+                        service.postSetPointTemperature(temperatura) {
+                            success, response ->
+                            if(!success){
+                                Log.i("ERRO", response.toString())
+                            }
+                        }
+                    },
                     valueRange = 20f..40f,
                     steps = 15,
                     modifier = Modifier.padding(horizontal = 16.dp)
