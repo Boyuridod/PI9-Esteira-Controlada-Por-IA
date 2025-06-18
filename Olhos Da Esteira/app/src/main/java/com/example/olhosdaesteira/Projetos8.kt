@@ -48,7 +48,7 @@ fun TelaProjetos8() {
     var ligado by remember { mutableStateOf(false) }
     var textoBotao = "Ligar lâmpada"
     var temperatura by remember { mutableStateOf(30) }
-    var service = ApiService("http://10.0.2.2:3333")
+    var service = ApiService("http://localhost:3333")
 
     Scaffold {
         innerPadding ->
