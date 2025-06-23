@@ -1,7 +1,7 @@
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from keras.layers import BatchNormalization
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator # type: ignore
 from keras.preprocessing.image import load_img, img_to_array
 import tensorflow as tf
 
@@ -69,7 +69,7 @@ amostras_teste = dados_teste.flow_from_directory('TesteCaixa',
 #Treinamento da rede
 classificador.fit(amostras_treinamento, 
                             steps_per_epoch = 100, 
-                            epochs = 45, 
+                            epochs = 10, 
                             validation_data = amostras_teste,
                             validation_steps = 100)
 
