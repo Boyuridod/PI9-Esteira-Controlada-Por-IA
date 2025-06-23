@@ -139,24 +139,26 @@ fun TelaCamera() {
                                 inputStream?.close()
 
                                 // Redimensiona a imagem para o tamanho esperado pelo modelo
-                                val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, true)
+                                val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 478, 850, true)
 
-                                // Prepara o ByteBuffer de entrada
-                                val inputBuffer = ByteBuffer.allocateDirect(120 * 120 * 3 * 4)
-                                inputBuffer.order(ByteOrder.nativeOrder())
+                                val input = Array(1) { Array(478) { Array(850) { FloatArray(3) } } }
 
-                                for (y in 0 until 120) {
-                                    for (x in 0 until 120) {
+                                for (y in 0 until 850) {
+                                    for (x in 0 until 478) {
                                         val pixel = resizedBitmap.getPixel(x, y)
-                                        inputBuffer.putFloat(((pixel shr 16 and 0xFF) / 255.0f)) // R
-                                        inputBuffer.putFloat(((pixel shr 8 and 0xFF) / 255.0f))  // G
-                                        inputBuffer.putFloat(((pixel and 0xFF) / 255.0f))        // B
+
+                                        val r = (pixel shr 16 and 0xFF) / 255.0f
+                                        val g = (pixel shr 8 and 0xFF) / 255.0f
+                                        val b = (pixel and 0xFF) / 255.0f
+
+                                        input[0][x][y][0] = r
+                                        input[0][x][y][1] = g
+                                        input[0][x][y][2] = b
                                     }
                                 }
-                                inputBuffer.rewind()
 
                                 // Carrega o modelo TFLite
-                                val assetFileDescriptor = context.assets.openFd("model.tflite")
+                                val assetFileDescriptor = context.assets.openFd("modelo.tflite")
                                 val fileInputStream = FileInputStream(assetFileDescriptor.fileDescriptor)
                                 val fileChannel = fileInputStream.channel
                                 val startOffset = assetFileDescriptor.startOffset
@@ -170,14 +172,14 @@ fun TelaCamera() {
                                 val interpreter = Interpreter(modelBuffer)
 
                                 // Prepara a saída
-                                val output = Array(1) { FloatArray(2) }  // Saída com 2 classes
-                                interpreter.run(inputBuffer, output)
+                                val output = Array(1) { FloatArray(3) }  // Saída com 2 classes
+                                interpreter.run(input, output)
 
                                 // Pega o índice da classe com maior confiança
                                 val resultado = output[0].withIndex().maxByOrNull { it.value }
                                 Toast.makeText(
                                     context,
-                                    "Classe detectada: ${resultado?.index} (Confiança: ${resultado?.value})",
+                                    "Classe detectada: ${if(resultado?.index==1) "Laranja" else "Verde"} ",
                                     Toast.LENGTH_LONG
                                 ).show()
 
@@ -187,7 +189,7 @@ fun TelaCamera() {
                             }
 
                             // Upload para o Firebase Storage
-                            val storageRef = com.google.firebase.ktx.Firebase.storage.reference
+                            /*val storageRef = com.google.firebase.ktx.Firebase.storage.reference
                             val imageRef = storageRef.child("imagens/${file.name}")
 
                             imageRef.putFile(fileUri)
@@ -200,9 +202,9 @@ fun TelaCamera() {
                                     }
                                 }
                                 .addOnFailureListener { exception ->
-                                    Toast.makeText(context, "Erro ao enviar imagem: ${exception.message}", Toast.LENGTH_LONG).show()
+                                    //Toast.makeText(context, "Erro ao enviar imagem: ${exception.message}", Toast.LENGTH_LONG).show()
                                     exception.printStackTrace()
-                                }
+                                }*/
                         }
 
                         override fun onError(exception: ImageCaptureException) {

@@ -2,9 +2,9 @@ import numpy as np
 from keras.models import load_model
 from keras.preprocessing.image import load_img, img_to_array
 
-model = load_model('my_model.h5')
+model = load_model('my_model.keras')
 
-imagem_teste = load_img(r'D:\imagens\imagens\TesteCaixa\vermelho\download.png', target_size=(120, 120))
+imagem_teste = load_img(r'D:\imagens\imagens\TesteCaixa\verde\verde232.png', target_size=(478, 850))
 
 imagem_teste.show()
 

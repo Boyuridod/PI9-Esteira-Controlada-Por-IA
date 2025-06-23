@@ -9,7 +9,8 @@ import os
 import numpy as np
 
 #Dimencionamento das informações para rede
-dim=120
+dimx=478
+dimy=850
 filtros=20
 canais=3
 maskaraconvolucao=3
@@ -17,7 +18,7 @@ maskarapooling=2
 
 #Convolucionamento das imagens
 classificador = Sequential()
-classificador.add(Conv2D(filtros, (maskaraconvolucao,maskaraconvolucao), input_shape = (dim, dim, canais), activation = 'relu'))
+classificador.add(Conv2D(filtros, (maskaraconvolucao,maskaraconvolucao), input_shape = (dimx, dimy, canais), activation = 'relu'))
 classificador.add(BatchNormalization())
 classificador.add(MaxPooling2D(pool_size = (maskarapooling,maskarapooling)))
 
@@ -34,7 +35,7 @@ classificador.add(Flatten())
 
 classificador.add(Dense(units = 128, activation = 'relu'))
 classificador.add(Dense(units = 128, activation = 'relu'))
-classificador.add(Dense(units = 2, activation = 'softmax'))
+classificador.add(Dense(units = 3, activation = 'softmax'))
 
 classificador.compile(optimizer = 'Adam', loss = 'categorical_crossentropy', 
                       metrics = ['categorical_accuracy'])
@@ -56,21 +57,21 @@ os.chdir(r'D:\DesenvolvimentoProjetos\PI9-Esteira-com-IA\CodigoIAReconhecimenrto
 
 
 amostras_treinamento = dados_treinamento.flow_from_directory('TreinamentoCaixa',
-                                                             target_size = (dim, dim),
+                                                             target_size = (dimx, dimy),
                                                              batch_size = 32,
                                                              class_mode = 'categorical')
 
 amostras_teste = dados_teste.flow_from_directory('TesteCaixa',
-                                                             target_size = (dim, dim),
+                                                             target_size = (dimx, dimy),
                                                              batch_size = 32,
                                                              class_mode = 'categorical')
 
 #Treinamento da rede
 classificador.fit(amostras_treinamento, 
-                            steps_per_epoch = 60, 
-                            epochs = 10, 
+                            steps_per_epoch = 100, 
+                            epochs = 45, 
                             validation_data = amostras_teste,
-                            validation_steps = 60)
+                            validation_steps = 100)
 
 classificador.save('my_model.keras')
 
