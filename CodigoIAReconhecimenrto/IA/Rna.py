@@ -69,7 +69,7 @@ amostras_teste = dados_teste.flow_from_directory('TesteCaixa',
 #Treinamento da rede
 classificador.fit(amostras_treinamento, 
                             steps_per_epoch = 100, 
-                            epochs = 10, 
+                            epochs = 45, 
                             validation_data = amostras_teste,
                             validation_steps = 100)
 
